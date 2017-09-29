@@ -1,0 +1,32 @@
+//load file and call it babyNames
+val babyNames = sc.textFile("baby_names.csv");
+ 
+//get count of entries
+babyNames.count;
+ 
+//get first line entry
+babyNames.first();
+
+//create rows by splitting at comma
+val rows = babyNames.map(line => line.split(","))
+
+//load information about first names = david
+val davidRows = rows.filter(row => row(1).contains("DAVID"));
+
+//how many davids
+davidRows.filter(row => row(4).toInt > 10).count();
+
+//Number of rows where “NAME” DAVID has a “Count” greater than 10
+davidRows.filter(row => row(4).toInt > 10).map( r => r(2) ).distinct.count;
+
+#load names from data 
+val names = rows.map(name => (name(1),1));
+
+// shows number lines each name appears in file, because how names was created
+// with rows.map(name => (name(1), 1)); Jacob appears most often, but is
+// actually not the most popular by total count.
+names.reduceByKey((a,b) => a + b).sortBy(_._2).foreach ( println _);
+
+val filteredRows = babyNames.filter(line => !line.contains("Count")).map(line => line.split(","));
+
+filteredRows.map ( n => (n(1), n(4).toInt)).reduceByKey((a,b) => a + b).sortBy(_._2).foreach (println _);
