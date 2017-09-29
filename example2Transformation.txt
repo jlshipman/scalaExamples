@@ -1,0 +1,41 @@
+//https://www.supergloo.com/fieldnotes/apache-spark-examples-of-transformations/
+
+//load file and call it babyNames
+val babyNames = sc.textFile("baby_names.csv")
+
+//map(func) 
+//Iterates over every line in the babyNames RDD (originally created
+//from baby_names.csv file) and splits into new RDD of Arrays of Strings.  The
+//arrays contain a String separated by comma characters in the source RDD (CSV).
+val rows = babyNames.map(line => line.split(","))
+
+//flatMap(func) 
+//Similar to map, but each input item can be mapped to 0 or more
+//output items (so func should return a Seq rather than a single item).
+//
+//flatMap is helpful with nested datasets.  It may be beneficial to think of the
+//RDD source as hierarchical JSON (which may have been converted to case classes
+//or nested collections).  This is unlike CSV which has no hierarchical
+//structural.
+//
+//By the way, these examples may blur the line between Scala and Spark for you. 
+//These examples highlight Scala and not necessarily Spark.   In a sense, the only
+//Spark specific portion of this code example is the use of parallelize from a
+//SparkContext.  When calling parallelize, the elements of the collection are
+//copied to form a distributed dataset that can be operated on in parallel.  Being
+//able to operate in parallel is a Spark feature.
+//Adding collect to both the flatMap and map results was shown for clarity.  We
+//can focus on Spark aspect (re: the RDD return type) of the example if we don’t
+//use collect as seen in the following:
+sc.parallelize(List(1,2,3)).flatMap(x=>List(x,x,x)).collect
+
+sc.parallelize(List(1,2,3)).map(x=>List(x,x,x)).collect
+
+//filter(func)
+//Filter creates a new RDD by passing in the supplied func used to filter the
+//results.  For those people with relational database background or coming from
+//a SQL perspective, it may be helpful think of filter as the where clause in a
+//SQL statement.
+val file = sc.textFile("catalina.out")
+
+val errors = file.filter(line => line.contains("ERROR"))
